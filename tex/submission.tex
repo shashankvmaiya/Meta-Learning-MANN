@@ -10,12 +10,14 @@
 
 % Please do not use the '<SCPD_SUBMISSION_TAG>' character anywhere within your code.  As expected,
 % that will confuse the regular expressions we use to identify your solution.
+
 \def\assignmentnum{2 }
 \def\assignmenttitle{XCS330 Problem Set \assignmentnum}
 \input{macros}
+\usepackage{graphicx}
+\graphicspath{ {./figures/} }
 \begin{document}
 \pagestyle{myheadings} \markboth{}{\assignmenttitle}
-
 % <SCPD_SUBMISSION_TAG>_entire_submission
 
 This handout includes space for every question that requires a written response.
@@ -31,8 +33,10 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_3_a
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+By comparing the plots for $(N, K) = (2, 1), (3, 1)$ and $(4, 1)$ - increasing the number of classes $N$ reduces the overall classification accuracy of the model on the meta-test query set. The learning rate (the rate at which the training and test loss reduces) is slower too. 
+
+As $N$ increases, the model has to additionally learn new classes and unless it predicts these new classes with 100\% accuracy, the overall accuracy will decrease. 
+
 \end{answer}
 % <SCPD_SUBMISSION_TAG>_3_a
 
@@ -44,8 +48,9 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_3_b
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+By comparing the plots for $(N, K) = (2, 1), (2, 2)$ - increasing the number of examples in the support set increases the accuracy of the model. 
+
+This is fairly intuitive as the model now has more examples to learn these new characters and hence does a better job in predicting these classes. 
 \end{answer}
 % <SCPD_SUBMISSION_TAG>_3_b
 
@@ -57,8 +62,27 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_4_a
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+Performance vs. Model hyper-parameters
+\begin{itemize}
+    \item Recurrent layer: Tried GRU and RNN as an alternate model architectures. GRU converged to a higher accuracy, and RNN converged to a lower accuracy. 
+
+    \includegraphics[width=16cm]{figures/hp_model_arch.jpg}
+    
+    \item Size of hidden state: Increasing the size of hidden state would improve model performance. However, this would come with at the cost of a larger model size and higher memory requirements
+    
+    \includegraphics[width=16cm]{figures/hp_hidden_dim.jpg}
+    
+    \item Learning rate: Increasing the learning rate would quicken the convergence to the optimum weights. However the variance once the model has converged is higher. 
+
+    \includegraphics[width=16cm]{figures/hp_lr.jpg}
+    
+    \item Number of layers: A model with higher number of layers would generally yield higher accuracy. 
+
+    \includegraphics[width=16cm]{figures/hp_layers.jpg}
+    
+\end{itemize}
+
+
 \end{answer}
 % <SCPD_SUBMISSION_TAG>_4_a
 
@@ -70,8 +94,12 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_4_b
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+Increasing the memory capacity improves the model performance (i.e., the accuracy on the meta-test query set) and likewise, decreasing the memory capacity deteriorates the model performance. The converged accuracy for $h = 8$ is less than the converged accuracy for $h=128$ which in turn is less than the converged accuracy for $h=256$.
+
+$h$ is a model hyper-parameter which corresponds to the number of hidden states. A model with higher number of hidden states can represent the information contained within the support set better and more accurately, which in turn is used to make predictions on the test dataset.
+
+\includegraphics[width=16cm]{figures/hp_hidden_dim.jpg}
+
   \end{answer}
 % <SCPD_SUBMISSION_TAG>_4_b
 

@@ -20,8 +20,8 @@ class MANN(nn.Module):
         self.num_classes = num_classes
         self.samples_per_class = samples_per_class
 
-        self.layer1 = torch.nn.LSTM(num_classes + 784, hidden_dim, batch_first=True)
-        self.layer2 = torch.nn.LSTM(hidden_dim, num_classes, batch_first=True)
+        self.layer1 = torch.nn.LSTM(num_classes + 784, hidden_dim, batch_first=True, num_layers=1)
+        self.layer2 = torch.nn.LSTM(hidden_dim, num_classes, batch_first=True, num_layers=1)
         initialize_weights(self.layer1)
         initialize_weights(self.layer2)
 
@@ -36,6 +36,16 @@ class MANN(nn.Module):
         """
         #############################
         ### START CODE HERE ###
+        B = input_images.size()[0]
+        image = input_images.view(B, self.num_classes * self.samples_per_class, 784) # image = [B, (K+1)*N, 784]
+        label = input_labels.view(B, self.num_classes * self.samples_per_class, self.num_classes) # label = [B, (K+1)*N, N]
+        layer1_inp = torch.cat((image, label), -1) # inp = [B, (K+1)*N, 784+N]
+        layer1_inp[:, -self.num_classes:, -self.num_classes:] = 0
+
+        layer1_out, _ = self.layer1(layer1_inp) # layer1_out = [B, (K+1)*N, h]
+        layer2_out, _ = self.layer2(layer1_out) # layer2_out = [B, (K+1)*N, N]
+        out = layer2_out.view(B, self.samples_per_class, self.num_classes, self.num_classes) # out = [B, K+1, N, N]
+        return out
         ### END CODE HERE ###
 
     def loss_function(self, preds, labels):
@@ -54,6 +64,11 @@ class MANN(nn.Module):
         loss = None
 
         ### START CODE HERE ###
+        B = preds.size()[0]
+        preds = preds[:, -1, :, :].reshape(-1, self.num_classes) # preds = [B*N, N]
+        labels = labels[:, -1, :, :].reshape(-1, self.num_classes) # labels = [B*N, N]
+        # labels = labels.view(B, self.num_classes, self.num_classes, self.samples_per_class)
+        loss = F.cross_entropy(preds, labels)
         ### END CODE HERE ###
 
         return loss

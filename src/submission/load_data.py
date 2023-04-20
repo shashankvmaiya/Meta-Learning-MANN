@@ -5,6 +5,7 @@ import torch
 from torch.utils.data import IterableDataset
 import time
 import imageio
+import torch.nn.functional as F
 
 
 def get_images(paths, labels, nb_samples=None, shuffle=True):
@@ -135,6 +136,34 @@ class DataGenerator(IterableDataset):
 
         #############################
         ### START CODE HERE ###
+        image_batch = torch.empty(self.num_samples_per_class, self.num_classes, 784)
+        label_batch = torch.empty(self.num_samples_per_class, self.num_classes, self.num_classes)
+        l_idx = torch.empty(self.num_samples_per_class, self.num_classes)
+
+        # Sample N different characters from specified folder
+        # random.shuffle(self.folders)
+        # character_folders = self.folders[:self.num_classes]
+        character_folders = random.sample(self.folders, self.num_classes)
+
+        image_labels = get_images(character_folders, np.arange(self.num_classes), self.num_samples_per_class)
+        support_idx = [0]*self.num_classes
+        label_idx = 0
+        for label, path in image_labels:
+            image = self.image_file_to_array(path, 784) # image = [1, 784]
+
+            if support_idx[label] < self.num_samples_per_class-1:
+                image_batch[support_idx[label], label, :] = torch.tensor(image)
+                label_batch[support_idx[label], label, :] = F.one_hot(torch.tensor([label]), num_classes=self.num_classes)
+                l_idx[support_idx[label], label] = label
+                support_idx[label] += 1
+            else:
+                image_batch[support_idx[label], label_idx, :] = torch.tensor(image)
+                label_batch[support_idx[label], label_idx, :] = F.one_hot(torch.tensor([label]), num_classes=self.num_classes)
+                l_idx[support_idx[label], label_idx] = label
+                label_idx += 1
+
+        return image_batch, label_batch
+
         ### END CODE HERE ###
 
     def __iter__(self):
